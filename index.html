@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruang Kerja - Platform Rekrutmen Berjenjang</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastelPink: '#FFD1DC',
+                        pastelGreen: '#C1E1C1'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+        }
+        .phone-frame {
+            width: 100%;
+            max-width: 410px;
+            height: 850px;
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 12px #1e293b;
+            position: relative;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+        .notch {
+            width: 140px;
+            height: 22px;
+            background-color: #1e293b;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 14px;
+            border-bottom-right-radius: 14px;
+            z-index: 50;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .glow-gold {
+            box-shadow: 0 0 20px rgba(255, 184, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-2 sm:p-4 bg-slate-950">
+
+    <!-- Phone Container -->
+    <div class="phone-frame flex flex-col justify-between relative border-4 border-slate-700">
+        <!-- Phone Notch -->
+        <div class="notch flex justify-center items-center">
+            <div class="w-10 h-1 bg-slate-600 rounded-full"></div>
+        </div>
+
+        <!-- APP CONTENT AREA -->
+        <div id="appContainer" class="h-full w-full flex flex-col bg-slate-900 text-slate-100 overflow-hidden pt-6">
+            
+            <!-- SPLASH SCREEN -->
+            <div id="splashScreen" class="h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-slate-900 via-slate-900 to-amber-950/40">
+                <div class="w-20 h-20 bg-gradient-to-tr from-amber-500 to-yellow-300 rounded-3xl flex items-center justify-center mb-6 shadow-xl glow-gold">
+                    <i class="fa-solid fa-briefcase text-4xl text-slate-950"></i>
+                </div>
+                <h1 class="text-2xl font-extrabold tracking-tight text-white mb-2">RUANG KERJA</h1>
+                <p class="text-xs text-amber-400 font-medium mb-8">Platform Rekrutmen & Kurasi Karir</p>
+                <div class="flex items-center space-x-2 text-slate-400 text-xs">
+                    <i class="fa-solid fa-circle-notch animate-spin text-amber-500"></i>
+                    <span>Memuat Sistem...</span>
+                </div>
+            </div>
+
+            <!-- ROLE SELECTION SCREEN -->
+            <div id="roleSelectScreen" class="hidden h-full flex flex-col justify-between p-6 bg-slate-900 fade-in">
+                <div class="mt-4 text-center">
+                    <div class="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full mb-3">
+                        <i class="fa-solid fa-layer-group text-amber-400 text-xs"></i>
+                        <span class="text-xs font-bold text-amber-400">Pilih Portal Akses</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-white">Selamat Datang!</h2>
+                    <p class="text-xs text-slate-400 mt-1">Silakan pilih peran Anda untuk masuk ke sistem</p>
+                </div>
+
+                <div class="space-y-3 my-auto">
+                    <!-- Option 1: Pekerja -->
+                    <button onclick="choosePortal('pekerja')" class="w-full bg-slate-800 hover:bg-slate-700/80 border border-slate-700 p-4 rounded-2xl flex items-center justify-between text-left transition duration-200 group">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center text-lg group-hover:scale-105 transition">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-bold text-white">1. Portal Pekerja</h3>
+                                <p class="text-[10px] text-slate-400">Cari kerja & obrolan (Admin + Perusahaan)</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-500 group-hover:translate-x-1 transition"></i>
+                    </button>
+
+                    <!-- Option 2: Perusahaan -->
+                    <button onclick="choosePortal('perusahaan')" class="w-full bg-slate-800 hover:bg-slate-700/80 border border-slate-700 p-4 rounded-2xl flex items-center justify-between text-left transition duration-200 group">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-lg group-hover:scale-105 transition">
+                                <i class="fa-solid fa-building"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-bold text-white">2. Portal Perusahaan</h3>
+                                <p class="text-[10px] text-slate-400">Pasang lowongan & obrolan dengan Pekerja</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-500 group-hover:translate-x-1 transition"></i>
+                    </button>
+
+                    <!-- Option 3: Admin -->
+                    <button onclick="choosePortal('admin')" class="w-full bg-slate-800 hover:bg-slate-700/80 border border-slate-700 p-4 rounded-2xl flex items-center justify-between text-left transition duration-200 group">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center text-lg group-hover:scale-105 transition">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-bold text-white">3. Portal Admin (Owner)</h3>
+                                <p class="text-[10px] text-slate-400">Pemilik sistem, kurasi lamaran & chat pelamar</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-500 group-hover:translate-x-1 transition"></i>
+                    </button>
+                </div>
+
+                <div class="text-center text-[10px] text-slate-500">
+                    &copy; 2026 Ruang Kerja Inc. All Rights Reserved.
+                </div>
+            </div>
+
+            <!-- LOGIN SCREEN -->
+            <div id="loginScreen" class="hidden h-full flex flex-col justify-between p-6 bg-slate-900 fade-in">
+                <div>
+                    <button onclick="backToPortalSelect()" class="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1 mb-6">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Kembali ke Portal</span>
+                    </button>
+                    <h2 class="text-xl font-bold text-white mb-1">Masuk Akun</h2>
+                    <p class="text-xs text-slate-400 mb-6">Portal terpilih: <span id="loginPortalBadge" class="text-amber-400 font-bold capitalize"></span></p>
+
+                    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Email / Username</label>
+                            <input type="email" id="loginEmail" required value="pekerja@ruangkerja.id" class="w-full text-xs p-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Kata Sandi</label>
+                            <input type="password" id="loginPassword" required value="password123" class="w-full text-xs p-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-extrabold rounded-xl shadow-lg hover:brightness-110 transition text-xs">
+                            Masuk Sekarang &rarr;
+                        </button>
+                    </form>
+                </div>
+
+                <div class="text-center text-xs text-slate-400">
+                    Belum punya akun? <button onclick="showRegisterScreen()" class="text-amber-400 font-bold hover:underline">Daftar Akun Baru</button>
+                </div>
+            </div>
+
+            <!-- REGISTER SCREEN -->
+            <div id="registerScreen" class="hidden h-full flex flex-col justify-between p-6 bg-slate-900 fade-in overflow-y-auto hide-scrollbar">
+                <div>
+                    <button onclick="showLoginScreen()" class="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1 mb-4">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Kembali ke Login</span>
+                    </button>
+                    <h2 class="text-xl font-bold text-white mb-1">Pendaftaran Akun</h2>
+                    <p class="text-xs text-slate-400 mb-6">Buat akun untuk portal <span id="registerPortalTitle" class="text-amber-400 font-bold capitalize"></span></p>
+
+                    <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Nama Lengkap / Perusahaan</label>
+                            <input type="text" id="regName" required placeholder="Contoh: Davinksu" class="w-full text-xs p-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Email Registrasi</label>
+                            <input type="email" id="regEmail" required placeholder="email@domain.com" class="w-full text-xs p-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Kata Sandi</label>
+                            <input type="password" id="regPassword" required placeholder="******" class="w-full text-xs p-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-extrabold rounded-xl shadow-lg hover:brightness-110 transition text-xs mt-2">
+                            Daftar & Masuk &rarr;
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- MAIN APP INTERFACE (POST-LOGIN) -->
+            <div id="mainApp" class="hidden h-full flex flex-col justify-between bg-slate-100 text-slate-800 relative">
+                <!-- App Header -->
+                <div class="bg-slate-900 text-white p-4 pt-3 border-b border-slate-800 shadow-sm flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center font-black text-slate-950 text-sm shadow">
+                            U
+                        </div>
+                        <div>
+                            <h2 class="text-xs font-bold leading-tight" id="userNameHeader">Davinksu</h2>
+                            <span class="text-[10px] text-amber-400 font-semibold uppercase tracking-wider" id="userRoleHeader">Pekerja</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="confirmSignOut()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 text-xs transition" title="Keluar">
+                            <i class="fa-solid fa-power-off text-rose-400"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Page Content Dynamic Box -->
+                <div id="pageContent" class="flex-1 overflow-y-auto p-4 hide-scrollbar">
+                    <!-- Dynamic page views generated by JS -->
+                </div>
+
+                <!-- Bottom Navigation Bar -->
+                <div id="bottomNav" class="bg-slate-900 border-t border-slate-800 flex justify-around items-center p-2 text-slate-400">
+                    <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition">
+                        <i class="fa-solid fa-house text-sm"></i>
+                        <span class="text-[9px] font-bold">Beranda</span>
+                    </button>
+                    <button onclick="navigateTo('jobs')" id="nav-jobs" class="flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition">
+                        <i class="fa-solid fa-briefcase text-sm"></i>
+                        <span class="text-[9px] font-bold">Lowongan</span>
+                    </button>
+                    <button onclick="navigateTo('chat')" id="nav-chat" class="flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition relative">
+                        <i class="fa-solid fa-comments text-sm"></i>
+                        <span class="text-[9px] font-bold">Pesan</span>
+                    </button>
+                    <button onclick="navigateTo('notifications')" id="nav-notifications" class="flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition relative">
+                        <i class="fa-solid fa-bell text-sm"></i>
+                        <span class="text-[9px] font-bold">Notifikasi</span>
+                    </button>
+                    <button onclick="navigateTo('subscription')" id="nav-subscription" class="flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition">
+                        <i class="fa-solid fa-crown text-sm"></i>
+                        <span class="text-[9px] font-bold">Paket</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALS & POPUPS -->
+
+    <!-- Email-Style Notification Reader Modal -->
+    <div id="notifDetailModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+        <div class="bg-white text-slate-900 rounded-3xl p-5 w-full max-w-sm shadow-2xl space-y-4 border border-slate-200">
+            <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-600 flex items-center justify-center">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-xs text-slate-900" id="notifModalSender">Sistem Ruang Kerja</h3>
+                        <p class="text-[9px] text-slate-400" id="notifModalTime">Baru saja</p>
+                    </div>
+                </div>
+                <button onclick="closeNotifDetailModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-2">
+                <h4 class="font-bold text-sm text-slate-900" id="notifModalTitle">Judul Notifikasi</h4>
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 leading-relaxed max-h-60 overflow-y-auto" id="notifModalBody">
+                    Isi notifikasi...
+                </div>
+            </div>
+            <button onclick="closeNotifDetailModal()" class="w-full py-2.5 bg-slate-900 text-white font-bold rounded-xl text-xs">Tutup Pesan</button>
+        </div>
+    </div>
+
+    <!-- Modal Buat Lowongan (Perusahaan) -->
+    <div id="createJobModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+        <div class="bg-white text-slate-900 rounded-3xl p-5 w-full max-w-md shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto hide-scrollbar">
+            <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+                <h3 class="font-extrabold text-sm text-slate-900">Buat Lowongan Pekerjaan Baru</h3>
+                <button onclick="closeCreateJobModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="submitCreateJob(event)" class="space-y-2.5">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Judul Posisi Pekerjaan</label>
+                    <input type="text" id="jobTitle" required placeholder="Contoh: Senior Graphic & UI Designer" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Departemen / Kategori</label>
+                        <input type="text" id="jobCategory" required placeholder="Contoh: Desain / IT" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Tipe Pekerjaan</label>
+                        <select id="jobType" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract / Freelance">Kontrak / Freelance</option>
+                            <option value="Internship">Magang (Intern)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Lokasi & Sistem Kerja</label>
+                        <input type="text" id="jobLocation" required placeholder="Medan / Remote / WFH" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Kisaran Gaji (Opsional)</label>
+                        <input type="text" id="jobSalary" placeholder="Contoh: Rp 4jt - 7jt" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Deskripsi Pekerjaan (Job Desc)</label>
+                    <textarea id="jobDesc" required rows="2" placeholder="Jelaskan tanggung jawab utama pekerjaan..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Kualifikasi & Persyaratan Wajib</label>
+                    <textarea id="jobReq" required rows="2" placeholder="Pengalaman minimal, software dikuasai, pendidikan..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl"></textarea>
+                </div>
+                <div class="pt-2 flex gap-2">
+                    <button type="button" onclick="closeCreateJobModal()" class="flex-1 py-2.5 border border-slate-200 text-slate-600 font-bold rounded-xl text-xs">Batal</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl text-xs shadow">Publikasikan Lowongan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Form Lamaran Kerja Modal -->
+    <div id="applyJobModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+        <div class="bg-white text-slate-900 rounded-3xl p-5 w-full max-w-sm shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+                <h3 class="font-extrabold text-sm text-slate-900">Kirim Lamaran Pekerjaan</h3>
+                <button onclick="closeApplyJobModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="submitJobApplication(event)" class="space-y-3">
+                <input type="hidden" id="applyJobId">
+                <input type="hidden" id="applyJobTitle">
+                <input type="hidden" id="applyJobCompany">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Nama Pelamar</label>
+                    <input type="text" id="applyName" required class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Email Kontak</label>
+                    <input type="email" id="applyEmail" required class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Pengalaman / Ringkasan Diri</label>
+                    <textarea id="applyExp" required rows="2" placeholder="Sebutkan keahlian Anda..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Link Resume / Portofolio (URL)</label>
+                    <input type="url" id="applyPortfolio" required placeholder="https://..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                </div>
+                <div class="pt-2 flex gap-2">
+                    <button type="button" onclick="closeApplyJobModal()" class="flex-1 py-2.5 border border-slate-200 text-slate-600 font-bold rounded-xl text-xs">Batal</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl text-xs shadow">Kirim Lamaran</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sign Out Modal -->
+    <div id="signOutModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+        <div class="bg-white text-slate-900 rounded-3xl p-5 w-full max-w-xs shadow-2xl text-center space-y-4">
+            <div class="w-12 h-12 bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </div>
+            <div>
+                <h3 class="font-extrabold text-sm">Konfirmasi Keluar</h3>
+                <p class="text-xs text-slate-500 mt-1">Apakah Anda yakin ingin keluar?</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeSignOutModal()" class="flex-1 py-2.5 border border-slate-200 text-slate-600 font-bold rounded-xl text-xs">Batal</button>
+                <button onclick="executeSignOut()" class="flex-1 py-2.5 bg-rose-600 text-white font-bold rounded-xl text-xs hover:bg-rose-500">Keluar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        const state = {
+            selectedPortal: 'pekerja',
+            currentRole: 'pekerja',
+            currentUserEmail: 'pekerja@ruangkerja.id',
+            currentUserName: 'Davinksu',
+            activeNav: 'dashboard',
+
+            activePekerjaChatTab: 'admin',
+            activeAdminTargetEmail: 'pekerja@ruangkerja.id', 
+            activeCompanyTargetApplicant: 'pekerja@ruangkerja.id', // Pelamar aktif yang sedang diclose chat-nya oleh Perusahaan
+
+            userAccounts: {
+                'pekerja@ruangkerja.id': {
+                    name: 'Davinksu',
+                    role: 'pekerja',
+                    subStatus: 'NONE',
+                    tier: 'Standard',
+                    silverUsedFreeMonth: false
+                },
+                'perusahaan@ruangkerja.id': {
+                    name: 'Davinksu Corp',
+                    role: 'perusahaan',
+                    subStatus: 'NONE',
+                    tier: 'Standard'
+                },
+                'admin@ruangkerja.id': {
+                    name: 'Admin Owner',
+                    role: 'admin',
+                    subStatus: 'APPROVED',
+                    tier: 'Owner (Master)'
+                }
+            },
+
+            jobs: [
+                {
+                    id: 1,
+                    title: 'Desainer Grafis & UI/UX',
+                    category: 'Desain Kreatif',
+                    type: 'Full-time',
+                    salary: 'Rp 5.000.000 - Rp 7.500.000',
+                    company: 'Davinksu Corp',
+                    companyEmail: 'perusahaan@ruangkerja.id',
+                    location: 'Medan (Hybrid)',
+                    desc: 'Mencari desainer berbakat untuk merancang materi visual promosi dan antarmuka aplikasi mobile.',
+                    req: 'Menguasai Adobe Photoshop, Illustrator, Figma, dan berpengalaman minimal 1 tahun.',
+                    status: 'APPROVED'
+                }
+            ],
+
+            applications: [],
+
+            chatsAdminPekerja: {},   
+            chatsCompanyPekerja: {}, // Format: { 'email_pekerja': [ {sender: '...', text: '...', time: '...'} ] }
+
+            notifications: [
+                {
+                    id: 1,
+                    recipientEmail: 'pekerja@ruangkerja.id',
+                    senderName: 'Sistem Ruang Kerja',
+                    title: 'Selamat Datang di Ruang Kerja!',
+                    message: 'Selamat datang! Silakan pilih Paket Langganan untuk mengaktifkan fitur melamar pekerjaan & obrolan.',
+                    time: 'Baru saja',
+                    read: false
+                },
+                {
+                    id: 2,
+                    recipientEmail: 'perusahaan@ruangkerja.id',
+                    senderName: 'Sistem Ruang Kerja',
+                    title: 'Selamat Datang Perusahaan!',
+                    message: 'Selamat datang! Silakan pilih Paket Langganan Perusahaan untuk dapat memublikasikan lowongan & menyeleksi kandidat.',
+                    time: 'Baru saja',
+                    read: false
+                }
+            ]
+        };
+
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('splashScreen').classList.add('hidden');
+                document.getElementById('roleSelectScreen').classList.remove('hidden');
+            }, 1000);
+        };
+
+        function choosePortal(portalName) {
+            state.selectedPortal = portalName;
+            state.currentRole = portalName;
+            
+            document.getElementById('loginPortalBadge').innerText = portalName;
+            document.getElementById('registerPortalTitle').innerText = portalName;
+
+            if(portalName === 'pekerja') {
+                document.getElementById('loginEmail').value = 'pekerja@ruangkerja.id';
+            } else if(portalName === 'perusahaan') {
+                document.getElementById('loginEmail').value = 'perusahaan@ruangkerja.id';
+            } else if(portalName === 'admin') {
+                document.getElementById('loginEmail').value = 'admin@ruangkerja.id';
+            }
+
+            document.getElementById('roleSelectScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function backToPortalSelect() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('roleSelectScreen').classList.remove('hidden');
+        }
+
+        function showRegisterScreen() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.remove('hidden');
+        }
+
+        function showLoginScreen() {
+            document.getElementById('registerScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            
+            if(!state.userAccounts[email]) {
+                state.userAccounts[email] = {
+                    name: email.split('@')[0],
+                    role: state.selectedPortal,
+                    subStatus: state.selectedPortal === 'admin' ? 'APPROVED' : 'NONE',
+                    tier: state.selectedPortal === 'admin' ? 'Owner (Master)' : 'Standard',
+                    silverUsedFreeMonth: false
+                };
+
+                state.notifications.unshift({
+                    id: Date.now(),
+                    recipientEmail: email,
+                    senderName: 'Sistem Ruang Kerja',
+                    title: 'Selamat Datang di Ruang Kerja!',
+                    message: state.selectedPortal === 'admin' 
+                        ? 'Selamat datang Admin Pemilik Sistem! Anda memiliki akses penuh.' 
+                        : 'Selamat datang! Pilih Paket Langganan Anda untuk menikmati fitur penuh.',
+                    time: 'Baru saja',
+                    read: false
+                });
+            }
+
+            const acc = state.userAccounts[email];
+            state.currentUserEmail = email;
+            state.currentUserName = acc.name;
+            state.currentRole = acc.role;
+
+            completeAuthentication();
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+
+            state.userAccounts[email] = {
+                name: name,
+                role: state.selectedPortal,
+                subStatus: state.selectedPortal === 'admin' ? 'APPROVED' : 'NONE',
+                tier: state.selectedPortal === 'admin' ? 'Owner (Master)' : 'Standard',
+                silverUsedFreeMonth: false
+            };
+
+            state.notifications.unshift({
+                id: Date.now(),
+                recipientEmail: email,
+                senderName: 'Sistem Ruang Kerja',
+                title: 'Selamat Datang di Ruang Kerja!',
+                message: 'Pendaftaran berhasil! Silakan tentukan Paket Langganan untuk akun Anda.',
+                time: 'Baru saja',
+                read: false
+            });
+
+            state.currentUserEmail = email;
+            state.currentUserName = name;
+            state.currentRole = state.selectedPortal;
+
+            completeAuthentication();
+        }
+
+        function completeAuthentication() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+
+            document.getElementById('userNameHeader').innerText = state.currentUserName;
+            document.getElementById('userRoleHeader').innerText = state.currentRole;
+
+            navigateTo('dashboard');
+        }
+
+        function navigateTo(page) {
+            state.activeNav = page;
+
+            ['dashboard', 'jobs', 'chat', 'notifications', 'subscription'].forEach(item => {
+                const navBtn = document.getElementById(`nav-${item}`);
+                if(navBtn) {
+                    if(item === page) {
+                        navBtn.className = "flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition text-amber-400 font-extrabold";
+                    } else {
+                        navBtn.className = "flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition text-slate-400 hover:text-slate-200";
+                    }
+                }
+            });
+
+            const container = document.getElementById('pageContent');
+            container.innerHTML = '';
+
+            if(page === 'dashboard') renderDashboardPage(container);
+            else if(page === 'jobs') renderJobsPage(container);
+            else if(page === 'chat') renderChatPage(container);
+            else if(page === 'notifications') renderNotificationsPage(container);
+            else if(page === 'subscription') renderSubscriptionPage(container);
+        }
+
+        // ==========================================
+        // 1. DASHBOARD PAGE
+        // ==========================================
+        function renderDashboardPage(container) {
+            const acc = state.userAccounts[state.currentUserEmail];
+            const isPekerja = state.currentRole === 'pekerja';
+            const isAdmin = state.currentRole === 'admin';
+
+            if(isAdmin) {
+                renderAdminDashboard(container);
+                return;
+            }
+
+            let statusBadge = "Akun Biasa (Belum Berlangganan)";
+            let statusColor = "bg-slate-700 text-slate-300";
+
+            if(acc.subStatus === 'PENDING') {
+                statusBadge = `Menunggu Approval Admin (${acc.tier})`;
+                statusColor = "bg-amber-500/20 text-amber-400 border border-amber-500/30";
+            } else if(acc.subStatus === 'APPROVED') {
+                statusBadge = `Aktif Paket ${acc.tier}`;
+                statusColor = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+            }
+
+            let html = `
+                <div class="fade-in space-y-4">
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-sm space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Status Berlangganan</span>
+                            <span class="text-[9px] font-extrabold px-2.5 py-0.5 rounded-full ${statusColor}">
+                                ${statusBadge}
+                            </span>
+                        </div>
+                        <h3 class="text-xs font-bold text-white">Halo, ${state.currentUserName}!</h3>
+                        <p class="text-[11px] text-slate-400 leading-snug">
+                            ${acc.subStatus === 'APPROVED' ? 'Paket langganan Anda aktif. Nikmati akses penuh layanan Ruang Kerja.' : 'Anda saat ini belum berlangganan. Aktifkan paket langganan untuk fitur lengkap.'}
+                        </p>
+                    </div>
+
+                    ${acc.subStatus !== 'APPROVED' ? `
+                        <div class="bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-2xl flex items-center justify-between">
+                            <div class="space-y-0.5">
+                                <h4 class="text-xs font-bold text-amber-300">Aktifkan Langganan!</h4>
+                                <p class="text-[10px] text-slate-300">${isPekerja ? 'Pilih Paket Silver Gratis / Premium' : 'Pilih Paket Berlangganan Perusahaan'}</p>
+                            </div>
+                            <button onclick="navigateTo('subscription')" class="px-3 py-1.5 bg-amber-500 text-slate-950 font-extrabold text-[10px] rounded-xl shadow">
+                                Pilih Paket &rarr;
+                            </button>
+                        </div>
+                    ` : ''}
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <h4 class="text-xs font-extrabold text-slate-900">
+                            ${isPekerja ? 'Status Lamaran Saya (Tracking Seleksi)' : 'Daftar Kandidat Pelamar Terverifikasi Admin'}
+                        </h4>
+                        ${isPekerja ? renderPekerjaApplicationsList() : renderPerusahaanCandidatesList()}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function renderPekerjaApplicationsList() {
+            const myApps = state.applications.filter(a => a.applicantEmail === state.currentUserEmail);
+            if(myApps.length === 0) {
+                return `<p class="text-xs text-slate-400 text-center py-4">Belum ada lamaran yang diajukan.</p>`;
+            }
+            return myApps.map(app => {
+                let badgeClass = "bg-amber-100 text-amber-700";
+                let statusText = "Tahap Skrining Chat Admin";
+                
+                if(app.status === 'FORWARDED_TO_COMPANY') {
+                    badgeClass = "bg-blue-100 text-blue-700";
+                    statusText = "Diteruskan ke Perusahaan";
+                } else if(app.status === 'ACCEPTED') {
+                    badgeClass = "bg-emerald-100 text-emerald-700";
+                    statusText = "DITERIMA PERUSAHAAN";
+                } else if(app.status === 'REJECTED') {
+                    badgeClass = "bg-rose-100 text-rose-700";
+                    statusText = "Lamaran Ditolak";
+                }
+
+                return `
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h5 class="text-xs font-bold text-slate-900">${app.jobTitle}</h5>
+                                <p class="text-[10px] text-slate-500">${app.companyName}</p>
+                            </div>
+                            <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full ${badgeClass}">
+                                ${statusText}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPerusahaanCandidatesList() {
+            const forwardedApps = state.applications.filter(a => a.companyEmail === state.currentUserEmail && a.status === 'FORWARDED_TO_COMPANY');
+            if(forwardedApps.length === 0) {
+                return `<p class="text-xs text-slate-400 text-center py-4">Belum ada pelamar baru yang diteruskan & direkomendasikan Admin.</p>`;
+            }
+
+            return forwardedApps.map(app => {
+                const applicantAcc = state.userAccounts[app.applicantEmail] || { tier: 'Standard' };
+                
+                let tierBadge = "bg-slate-100 text-slate-700";
+                let highlightText = "Pelamar Standar";
+
+                if(applicantAcc.tier === 'Silver') {
+                    tierBadge = "bg-slate-200 text-slate-800 border border-slate-300";
+                    highlightText = "⚡ Member Silver Berlangganan";
+                } else if(applicantAcc.tier === 'Platinum') {
+                    tierBadge = "bg-amber-100 text-amber-800 border border-amber-300 font-extrabold";
+                    highlightText = "⭐ Member Platinum Prioritas";
+                } else if(applicantAcc.tier === 'Gold') {
+                    tierBadge = "bg-yellow-200 text-yellow-900 border border-yellow-400 font-black";
+                    highlightText = "🔥 Member Gold Top Prioritas";
+                } else if(applicantAcc.tier === 'Diamond') {
+                    tierBadge = "bg-cyan-100 text-cyan-900 border border-cyan-400 font-black";
+                    highlightText = "💎 Member Diamond VIP Ultimate";
+                }
+
+                return `
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h5 class="text-xs font-bold text-slate-900">${app.applicantName}</h5>
+                                <p class="text-[10px] text-slate-500">Posisi: ${app.jobTitle}</p>
+                            </div>
+                            <span class="text-[9px] px-2 py-0.5 rounded-full ${tierBadge}">
+                                ${applicantAcc.tier}
+                            </span>
+                        </div>
+
+                        <!-- Catatan Rekomendasi Admin -->
+                        <div class="p-2 bg-amber-50 border border-amber-200 rounded-lg text-[10px] text-amber-900 space-y-0.5">
+                            <span class="font-extrabold flex items-center gap-1"><i class="fa-solid fa-circle-check text-emerald-600"></i> Rekomendasi Admin Ruang Kerja:</span>
+                            <p class="text-[9px] text-slate-700">Kandidat ini telah diuji dan dikonfirmasi melalui obrolan langsung oleh Admin. Sangat memahami kualifikasi pekerjaan Anda.</p>
+                        </div>
+
+                        <div class="text-[10px] bg-white p-2 rounded border border-slate-200 space-y-1">
+                            <p class="text-amber-600 font-bold">${highlightText}</p>
+                            <p><strong>Pengalaman:</strong> ${app.applicantExp}</p>
+                            <p><strong>Portofolio:</strong> <a href="${app.applicantPortfolio}" target="_blank" class="text-cyan-600 underline">${app.applicantPortfolio}</a></p>
+                        </div>
+                        <div class="flex gap-2 pt-1">
+                            <button onclick="companyOpenChat('${app.applicantEmail}')" class="py-1.5 px-3 bg-slate-900 text-amber-400 font-bold text-[10px] rounded-lg">
+                                💬 Chat
+                            </button>
+                            <button onclick="companyDecision('${app.id}', 'ACCEPTED')" class="flex-1 py-1.5 bg-emerald-600 text-white font-extrabold text-[10px] rounded-lg shadow hover:bg-emerald-500">
+                                ✅ Terima Pelamar
+                            </button>
+                            <button onclick="companyDecision('${app.id}', 'REJECTED')" class="py-1.5 px-3 bg-rose-100 text-rose-600 font-bold text-[10px] rounded-lg hover:bg-rose-200">
+                                ❌ Tolak
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function companyOpenChat(applicantEmail) {
+            state.activeCompanyTargetApplicant = applicantEmail;
+            navigateTo('chat');
+        }
+
+        function companyDecision(appId, decision) {
+            const app = state.applications.find(a => a.id == appId);
+            if(!app) return;
+
+            if(decision === 'ACCEPTED') {
+                const autoMsg = prompt("Ketikkan Pesan/Instruksi Otomatis Penerimaan untuk Pelamar:", "Selamat! Anda DITERIMA di Perusahaan kami. Silakan hubungi HRD esok hari pukul 09.00 WIB untuk jadwal onboarding.");
+                if(autoMsg === null) return;
+
+                app.status = 'ACCEPTED';
+
+                // 1. Notifikasi Resmi
+                state.notifications.unshift({
+                    id: Date.now(),
+                    recipientEmail: app.applicantEmail,
+                    senderName: state.currentUserName + ' (Perusahaan)',
+                    title: '🎉 Selamat! Lamaran Pekerjaan Diterima',
+                    message: `Selamat! Lamaran Anda untuk posisi "${app.jobTitle}" telah DITERIMA oleh ${app.companyName}. Pesan Resmi dari Perusahaan: "${autoMsg}"`,
+                    time: 'Baru saja',
+                    read: false
+                });
+
+                // 2. Masukkan Pesan Perusahaan Langsung ke Store Chat Perusahaan - Pekerja
+                if(!state.chatsCompanyPekerja[app.applicantEmail]) {
+                    state.chatsCompanyPekerja[app.applicantEmail] = [];
+                }
+                const now = new Date();
+                const timeStr = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+
+                state.chatsCompanyPekerja[app.applicantEmail].push({
+                    sender: state.currentUserName, // Nama Perusahaan
+                    text: `[PENGUMUMAN PENERIMAAN]: ${autoMsg}`,
+                    time: timeStr
+                });
+
+                alert('Pelamar berhasil Diterima! Pesan otomatis telah dikirimkan ke kotak chat Perusahaan & Pekerja.');
+            } else {
+                app.status = 'REJECTED';
+                state.notifications.unshift({
+                    id: Date.now(),
+                    recipientEmail: app.applicantEmail,
+                    senderName: state.currentUserName + ' (Perusahaan)',
+                    title: 'Informasi Hasil Lamaran Pekerjaan',
+                    message: `Terima kasih telah melamar posisi "${app.jobTitle}" di ${app.companyName}. Mohon maaf, saat ini lamaran Anda belum dapat diterima.`,
+                    time: 'Baru saja',
+                    read: false
+                });
+
+                alert('Lamaran telah ditolak.');
+            }
+
+            renderDashboardPage(document.getElementById('pageContent'));
+        }
+
+        function renderAdminDashboard(container) {
+            const pendingSubs = Object.keys(state.userAccounts).filter(email => {
+                const acc = state.userAccounts[email];
+                return acc.subStatus === 'PENDING' && acc.role !== 'admin';
+            });
+            const pendingApps = state.applications.filter(a => a.status === 'PENDING_ADMIN');
+
+            let html = `
+                <div class="fade-in space-y-4">
+                    <div class="bg-amber-500/10 border border-amber-500/30 p-3 rounded-2xl flex items-center space-x-3 text-amber-400">
+                        <i class="fa-solid fa-crown text-2xl text-amber-400"></i>
+                        <div>
+                            <h3 class="text-xs font-bold">Panel Kurasi & Skrining Admin Master</h3>
+                            <p class="text-[10px] text-amber-200/70">Cek berkas pelamar & wawancara chat sebelum meneruskan</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <h4 class="text-xs font-extrabold text-slate-900 border-b pb-2 flex justify-between items-center">
+                            <span>1. Approval Paket Langganan Pelanggan</span>
+                            <span class="bg-amber-100 text-amber-800 text-[9px] px-2 py-0.5 rounded-full">${pendingSubs.length} Request</span>
+                        </h4>
+                        ${pendingSubs.length === 0 ? `<p class="text-xs text-slate-400 py-2 text-center">Tidak ada pengajuan langganan baru.</p>` : ''}
+                        ${pendingSubs.map(email => {
+                            const acc = state.userAccounts[email];
+                            return `
+                                <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-900">${acc.name}</p>
+                                        <span class="text-[10px] text-slate-500 font-semibold capitalize">${acc.role} &bull; Paket ${acc.tier}</span>
+                                    </div>
+                                    <button onclick="approveSubscription('${email}')" class="px-3 py-1.5 bg-amber-500 text-slate-950 font-extrabold text-[10px] rounded-lg shadow">
+                                        Approve
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <h4 class="text-xs font-extrabold text-slate-900 border-b pb-2 flex justify-between items-center">
+                            <span>2. Kurasi & Wawancara Pelamar Kerja</span>
+                            <span class="bg-amber-100 text-amber-800 text-[9px] px-2 py-0.5 rounded-full">${pendingApps.length} Lamaran</span>
+                        </h4>
+                        ${pendingApps.length === 0 ? `<p class="text-xs text-slate-400 py-2 text-center">Tidak ada lamaran yang memerlukan kurasi.</p>` : ''}
+                        ${pendingApps.map(app => `
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h5 class="text-xs font-bold text-slate-900">${app.applicantName}</h5>
+                                        <p class="text-[10px] text-slate-500">Melamar: <strong>${app.jobTitle}</strong> di ${app.companyName}</p>
+                                    </div>
+                                    <span class="text-[8px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">Perlu Skrining</span>
+                                </div>
+                                <div class="p-2 bg-white rounded border border-slate-200 text-[10px] text-slate-700 space-y-0.5">
+                                    <p><strong>Pengalaman:</strong> ${app.applicantExp}</p>
+                                    <p><strong>Portofolio:</strong> <a href="${app.applicantPortfolio}" target="_blank" class="text-cyan-600 underline">${app.applicantPortfolio}</a></p>
+                                </div>
+                                <div class="flex gap-2 pt-1">
+                                    <button onclick="adminStartChatWithApplicant('${app.applicantEmail}')" class="flex-1 py-1.5 bg-slate-900 text-amber-400 font-bold text-[10px] rounded-lg border border-slate-800">
+                                        💬 Chat / Wawancara Pekerja
+                                    </button>
+                                    <button onclick="adminApproveAndSendToCompany('${app.id}')" class="flex-1 py-1.5 bg-emerald-600 text-white font-bold text-[10px] rounded-lg shadow">
+                                        ✅ Loloskan ke Perusahaan
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function adminStartChatWithApplicant(applicantEmail) {
+            state.activeAdminTargetEmail = applicantEmail;
+            navigateTo('chat');
+        }
+
+        function approveSubscription(email) {
+            const acc = state.userAccounts[email];
+            if(acc) {
+                acc.subStatus = 'APPROVED';
+                
+                if(acc.tier === 'Silver' && !acc.silverUsedFreeMonth && acc.role === 'pekerja') {
+                    acc.silverUsedFreeMonth = true;
+                }
+
+                state.notifications.unshift({
+                    id: Date.now(),
+                    recipientEmail: email,
+                    senderName: 'Admin Ruang Kerja',
+                    title: 'Paket Langganan Di-Approve!',
+                    message: `Selamat! Pengajuan Paket Langganan (${acc.tier}) Anda telah disetujui Admin. Fitur akun Anda telah aktif sepenuhnya.`,
+                    time: 'Baru saja',
+                    read: false
+                });
+
+                alert(`Langganan ${acc.name} (${acc.role}) berhasil di-approve oleh Admin!`);
+                renderAdminDashboard(document.getElementById('pageContent'));
+            }
+        }
+
+        function adminApproveAndSendToCompany(appId) {
+            const app = state.applications.find(a => a.id == appId);
+            if(!app) return;
+
+            app.status = 'FORWARDED_TO_COMPANY';
+
+            state.notifications.unshift({
+                id: Date.now(),
+                recipientEmail: app.companyEmail,
+                senderName: 'Admin Ruang Kerja',
+                title: '⭐ Kandidat Terverifikasi & Direkomendasikan Admin',
+                message: `Admin telah melakukan verifikasi dan wawancara langsung dengan pelamar "${app.applicantName}" untuk posisi "${app.jobTitle}". Pelamar benar-benar memahami dan menguasai pekerjaan ini. Silakan periksa kandidat di Dashboard Anda.`,
+                time: 'Baru saja',
+                read: false
+            });
+
+            state.notifications.unshift({
+                id: Date.now() + 1,
+                recipientEmail: app.applicantEmail,
+                senderName: 'Admin Ruang Kerja',
+                title: '✅ Anda Lolos Skrining Admin!',
+                message: `Selamat! Berdasarkan hasil peninjauan/chat, Admin menyatakan Anda cocok dan telah meloloskan berkas Anda ke ${app.companyName}.`,
+                time: 'Baru saja',
+                read: false
+            });
+
+            alert('Lamaran berhasil diloloskan! Notifikasi verifikasi & rekomendasi resmi telah dikirim ke Perusahaan.');
+            renderAdminDashboard(document.getElementById('pageContent'));
+        }
+
+        // ==========================================
+        // 2. JOBS PAGE
+        // ==========================================
+        function renderJobsPage(container) {
+            const isPekerja = state.currentRole === 'pekerja';
+            const isPerusahaan = state.currentRole === 'perusahaan';
+            const acc = state.userAccounts[state.currentUserEmail];
+            const approvedJobs = state.jobs.filter(j => j.status === 'APPROVED');
+
+            let html = `
+                <div class="fade-in space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-slate-900">Lowongan Pekerjaan</h3>
+                            <p class="text-[10px] text-slate-500">Daftar lowongan kerja aktif</p>
+                        </div>
+                        ${isPerusahaan ? `
+                            <button onclick="openCreateJobModal()" class="px-3 py-1.5 bg-emerald-600 text-white font-extrabold text-[10px] rounded-xl shadow hover:bg-emerald-500">
+                                + Buat Lowongan
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    ${acc.subStatus !== 'APPROVED' && isPekerja ? `
+                        <div class="bg-amber-500/10 border border-amber-500/30 p-3 rounded-2xl text-center space-y-1">
+                            <span class="font-extrabold block text-slate-900 text-xs">Melamar Terkunci!</span>
+                            <p class="text-[10px] text-slate-600">Aktifkan Paket Langganan untuk dapat mengirim lamaran ke Perusahaan.</p>
+                        </div>
+                    ` : ''}
+
+                    <div class="space-y-3">
+                        ${approvedJobs.map(job => `
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="text-xs font-extrabold text-slate-900">${job.title}</h4>
+                                        <p class="text-[10px] text-slate-500 font-semibold">${job.company} &bull; <span class="text-emerald-600">${job.category}</span></p>
+                                    </div>
+                                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">${job.type}</span>
+                                </div>
+                                <div class="text-[10px] text-slate-600 space-y-1 bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                    <p><strong>Lokasi:</strong> ${job.location}</p>
+                                    <p><strong>Gaji:</strong> <span class="text-amber-600 font-bold">${job.salary || 'Kompetitif'}</span></p>
+                                    <p><strong>Deskripsi:</strong> ${job.desc}</p>
+                                    <p><strong>Persyaratan:</strong> ${job.req}</p>
+                                </div>
+                                
+                                ${isPekerja ? `
+                                    <button onclick="attemptApplyJob(${job.id}, '${job.title}', '${job.company}', '${job.companyEmail}')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-amber-400 font-extrabold rounded-xl text-xs transition">
+                                        Kirim Lamaran Pekerjaan
+                                    </button>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function openCreateJobModal() {
+            const acc = state.userAccounts[state.currentUserEmail];
+            if(acc.subStatus !== 'APPROVED') {
+                alert('Perusahaan harus mengaktifkan Paket Langganan terlebih dahulu untuk memublikasikan lowongan!');
+                navigateTo('subscription');
+                return;
+            }
+            document.getElementById('createJobModal').classList.remove('hidden');
+        }
+
+        function closeCreateJobModal() {
+            document.getElementById('createJobModal').classList.add('hidden');
+        }
+
+        function submitCreateJob(e) {
+            e.preventDefault();
+            const title = document.getElementById('jobTitle').value;
+            const category = document.getElementById('jobCategory').value;
+            const type = document.getElementById('jobType').value;
+            const location = document.getElementById('jobLocation').value;
+            const salary = document.getElementById('jobSalary').value;
+            const desc = document.getElementById('jobDesc').value;
+            const req = document.getElementById('jobReq').value;
+
+            state.jobs.unshift({
+                id: Date.now(),
+                title: title,
+                category: category,
+                type: type,
+                salary: salary,
+                company: state.currentUserName,
+                companyEmail: state.currentUserEmail,
+                location: location,
+                desc: desc,
+                req: req,
+                status: 'APPROVED'
+            });
+
+            closeCreateJobModal();
+            alert('Lowongan Pekerjaan detail baru berhasil dipublikasikan!');
+            renderJobsPage(document.getElementById('pageContent'));
+        }
+
+        function attemptApplyJob(id, title, company, companyEmail) {
+            const acc = state.userAccounts[state.currentUserEmail];
+            if(acc.subStatus !== 'APPROVED') {
+                alert('Mohon maaf, Anda belum mengaktifkan Paket Langganan. Silakan pilih paket langganan (seperti Paket Silver Gratis) di menu Paket!');
+                navigateTo('subscription');
+                return;
+            }
+
+            openApplyJobModal(id, title, company, companyEmail);
+        }
+
+        function openApplyJobModal(id, title, company, companyEmail) {
+            document.getElementById('applyJobId').value = id;
+            document.getElementById('applyJobTitle').value = title;
+            document.getElementById('applyJobCompany').value = company;
+            document.getElementById('applyJobCompany').setAttribute('data-email', companyEmail);
+
+            document.getElementById('applyName').value = state.currentUserName;
+            document.getElementById('applyEmail').value = state.currentUserEmail;
+
+            document.getElementById('applyJobModal').classList.remove('hidden');
+        }
+
+        function closeApplyJobModal() {
+            document.getElementById('applyJobModal').classList.add('hidden');
+        }
+
+        function submitJobApplication(event) {
+            event.preventDefault();
+            const name = document.getElementById('applyName').value;
+            const email = document.getElementById('applyEmail').value;
+            const exp = document.getElementById('applyExp').value;
+            const portfolio = document.getElementById('applyPortfolio').value;
+            
+            const jobId = document.getElementById('applyJobId').value;
+            const jobTitle = document.getElementById('applyJobTitle').value;
+            const companyName = document.getElementById('applyJobCompany').value;
+            const companyEmail = document.getElementById('applyJobCompany').getAttribute('data-email');
+
+            const newApp = {
+                id: Date.now(),
+                jobId: jobId,
+                jobTitle: jobTitle,
+                companyName: companyName,
+                companyEmail: companyEmail,
+                applicantName: name,
+                applicantEmail: email,
+                applicantExp: exp,
+                applicantPortfolio: portfolio,
+                status: 'PENDING_ADMIN'
+            };
+
+            state.applications.unshift(newApp);
+
+            state.notifications.unshift({
+                id: Date.now(),
+                recipientEmail: 'admin@ruangkerja.id',
+                senderName: name,
+                title: '📥 Lamaran Kerja Baru Perlu Skrining',
+                message: `Pelamar ${name} melamar posisi "${jobTitle}" di ${companyName}. Silakan lakukan peninjauan & wawancara via chat.`,
+                time: 'Baru saja',
+                read: false
+            });
+
+            closeApplyJobModal();
+            alert('Lamaran Anda berhasil dikirim! Admin akan segera menghubungi Anda melalui Chat untuk proses skrining sebelum meneruskan ke Perusahaan.');
+            navigateTo('dashboard');
+        }
+
+        // ==========================================
+        // 3. CHAT PAGE (DIPERBAIKI UNTUK DUA ARAH PERUSAHAAN & PEKERJA)
+        // ==========================================
+        function renderChatPage(container) {
+            const isPekerja = state.currentRole === 'pekerja';
+            const isAdmin = state.currentRole === 'admin';
+
+            let html = `
+                <div class="fade-in flex flex-col h-full bg-slate-900 rounded-2xl overflow-hidden border border-slate-800">
+                    
+                    ${isPekerja ? `
+                        <!-- Switcher 2 Tab Khusus Portal Pekerja -->
+                        <div class="bg-slate-800 p-2 flex border-b border-slate-700 gap-1">
+                            <button onclick="switchPekerjaChatTab('admin')" class="flex-1 py-1.5 text-[10px] font-extrabold rounded-lg transition ${state.activePekerjaChatTab === 'admin' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'}">
+                                💬 Chat Admin
+                            </button>
+                            <button onclick="switchPekerjaChatTab('perusahaan')" class="flex-1 py-1.5 text-[10px] font-extrabold rounded-lg transition ${state.activePekerjaChatTab === 'perusahaan' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'}">
+                                🏢 Chat Perusahaan
+                            </button>
+                        </div>
+                    ` : isAdmin ? `
+                        <!-- Header Chat Admin ke Pelamar -->
+                        <div class="bg-slate-800 p-3 flex items-center justify-between border-b border-slate-700">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center font-bold text-xs">
+                                    <i class="fa-solid fa-user-check"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-xs text-slate-100">Ruang Wawancara Skrining Pekerja</h3>
+                                    <p class="text-[9px] text-amber-400">Target: ${state.activeAdminTargetEmail}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ` : `
+                        <!-- Header Single Tab Perusahaan -->
+                        <div class="bg-slate-800 p-3 flex items-center justify-between border-b border-slate-700">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center font-bold text-xs">
+                                    <i class="fa-solid fa-comments"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-xs text-slate-100">Ruang Pesan Kandidat Pelamar</h3>
+                                    <p class="text-[9px] text-emerald-400">Aktif Berkomunikasi dengan: ${state.activeCompanyTargetApplicant}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `}
+
+                    <!-- Chat Body -->
+                    <div id="chatMessagesBox" class="flex-1 p-3 overflow-y-auto space-y-2 hide-scrollbar">
+                        ${renderChatMessages()}
+                    </div>
+
+                    <!-- Chat Input -->
+                    <form onsubmit="sendMessage(event)" class="p-2 bg-slate-800 border-t border-slate-700 flex space-x-2">
+                        <input type="text" id="chatInput" placeholder="Tulis pesan..." required class="flex-1 text-xs p-2.5 bg-slate-900 text-white border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500">
+                        <button type="submit" class="w-10 h-10 bg-amber-500 text-slate-950 rounded-xl flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function switchPekerjaChatTab(tab) {
+            state.activePekerjaChatTab = tab;
+            renderChatPage(document.getElementById('pageContent'));
+        }
+
+        function renderChatMessages() {
+            const isPekerja = state.currentRole === 'pekerja';
+            const isAdmin = state.currentRole === 'admin';
+            let store;
+            let chatKey;
+
+            if(isPekerja) {
+                if(state.activePekerjaChatTab === 'admin') {
+                    store = state.chatsAdminPekerja;
+                    chatKey = state.currentUserEmail;
+                } else {
+                    store = state.chatsCompanyPekerja;
+                    chatKey = state.currentUserEmail; // Pekerja melihat chat dengan perusahaannya sendiri
+                }
+            } else if(isAdmin) {
+                store = state.chatsAdminPekerja;
+                chatKey = state.activeAdminTargetEmail; 
+            } else {
+                // Perusahaan melihat chat dengan pelamar yang sedang dipilih
+                store = state.chatsCompanyPekerja;
+                chatKey = state.activeCompanyTargetApplicant; 
+            }
+
+            if(!store[chatKey] || store[chatKey].length === 0) {
+                return `
+                    <div class="flex flex-col items-center justify-center h-full text-center p-4 text-slate-500 my-auto">
+                        <i class="fa-solid fa-comments text-3xl mb-2 text-slate-600"></i>
+                        <p class="text-xs font-bold text-slate-400">Belum Ada Pesan</p>
+                        <p class="text-[10px] mt-1 max-w-xs">Kirim pesan pertama untuk memulai percakapan dua arah.</p>
+                    </div>
+                `;
+            }
+
+            return store[chatKey].map(msg => `
+                <div class="flex flex-col ${msg.sender === state.currentUserName ? 'items-end' : 'items-start'}">
+                    <div class="max-w-[80%] p-2.5 rounded-2xl text-xs ${msg.sender === state.currentUserName ? 'bg-amber-500 text-slate-950 font-medium rounded-tr-none' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-tl-none'}">
+                        <p class="text-[8px] font-bold opacity-75 mb-0.5">${msg.sender}</p>
+                        <p>${msg.text}</p>
+                    </div>
+                    <span class="text-[8px] text-slate-500 mt-0.5 px-1">${msg.time}</span>
+                </div>
+            `).join('');
+        }
+
+        function sendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            if(!input.value.trim()) return;
+
+            const isPekerja = state.currentRole === 'pekerja';
+            const isAdmin = state.currentRole === 'admin';
+            let store;
+            let chatKey;
+
+            if(isPekerja) {
+                if(state.activePekerjaChatTab === 'admin') {
+                    store = state.chatsAdminPekerja;
+                    chatKey = state.currentUserEmail;
+                } else {
+                    store = state.chatsCompanyPekerja;
+                    chatKey = state.currentUserEmail;
+                }
+            } else if(isAdmin) {
+                store = state.chatsAdminPekerja;
+                chatKey = state.activeAdminTargetEmail;
+            } else {
+                store = state.chatsCompanyPekerja;
+                chatKey = state.activeCompanyTargetApplicant;
+            }
+
+            if(!store[chatKey]) {
+                store[chatKey] = [];
+            }
+
+            const now = new Date();
+            const timeStr = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+
+            store[chatKey].push({
+                sender: state.currentUserName, // Nama pengirim (bisa Pekerja, Perusahaan, atau Admin)
+                text: input.value.trim(),
+                time: timeStr
+            });
+
+            input.value = '';
+            renderChatPage(document.getElementById('pageContent'));
+        }
+
+        // ==========================================
+        // 4. NOTIFICATIONS PAGE
+        // ==========================================
+        function renderNotificationsPage(container) {
+            const myNotifs = state.notifications.filter(n => n.recipientEmail === state.currentUserEmail || n.recipientEmail === 'all');
+
+            let html = `
+                <div class="fade-in space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-slate-900">Kotak Masuk Pesan & Notifikasi</h3>
+                            <p class="text-[10px] text-slate-500">Klik notifikasi untuk membaca pesan lengkap</p>
+                        </div>
+                        <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">${myNotifs.length} Pesan</span>
+                    </div>
+
+                    <div class="space-y-2">
+                        ${myNotifs.length === 0 ? `<p class="text-xs text-slate-400 py-8 text-center">Kotak masuk Anda kosong.</p>` : ''}
+                        ${myNotifs.map(n => `
+                            <div onclick="openNotifDetail(${n.id})" class="p-3.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl shadow-sm space-y-1 cursor-pointer transition group">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center space-x-1.5">
+                                        <i class="fa-solid fa-envelope text-amber-500 text-xs"></i>
+                                        <span class="text-[10px] font-extrabold text-slate-900">${n.senderName}</span>
+                                    </div>
+                                    <span class="text-[9px] text-slate-400">${n.time}</span>
+                                </div>
+                                <h4 class="text-xs font-bold text-slate-800 group-hover:text-amber-600 transition">${n.title}</h4>
+                                <p class="text-[10px] text-slate-500 line-clamp-1">${n.message}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function openNotifDetail(notifId) {
+            const n = state.notifications.find(item => item.id == notifId);
+            if(!n) return;
+
+            document.getElementById('notifModalSender').innerText = n.senderName;
+            document.getElementById('notifModalTime').innerText = n.time;
+            document.getElementById('notifModalTitle').innerText = n.title;
+            document.getElementById('notifModalBody').innerText = n.message;
+
+            document.getElementById('notifDetailModal').classList.remove('hidden');
+        }
+
+        function closeNotifDetailModal() {
+            document.getElementById('notifDetailModal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 5. SUBSCRIPTION PAGE
+        // ==========================================
+        function renderSubscriptionPage(container) {
+            const acc = state.userAccounts[state.currentUserEmail];
+            const isPekerja = state.currentRole === 'pekerja';
+            const isAdmin = state.currentRole === 'admin';
+
+            if(isAdmin) {
+                container.innerHTML = `
+                    <div class="fade-in bg-slate-900 text-white p-6 rounded-2xl border border-amber-500/30 text-center space-y-3 my-auto">
+                        <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-xl">
+                            <i class="fa-solid fa-crown"></i>
+                        </div>
+                        <h3 class="text-sm font-extrabold text-amber-400">Akun Admin Master (Owner)</h3>
+                        <p class="text-xs text-slate-300">Sebagai pemilik bisnis platform Ruang Kerja, akun Admin Anda secara otomatis memiliki akses penuh gratis tanpa batasan langganan.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if(isPekerja) {
+                renderPekerjaSubscription(container, acc);
+            } else {
+                renderPerusahaanSubscription(container, acc);
+            }
+        }
+
+        function renderPekerjaSubscription(container, acc) {
+            const silverPriceText = acc.silverUsedFreeMonth ? 'Rp 25.000 / bulan' : 'GRATIS (1 Bulan Pertama)';
+            const silverSubText = acc.silverUsedFreeMonth ? 'Biaya langganan normal bulan berikutnya.' : 'Bulan pertama GRATIS, bulan berikutnya Rp 25.000/bulan.';
+
+            let html = `
+                <div class="fade-in space-y-4">
+                    <div class="text-center">
+                        <h3 class="text-sm font-extrabold text-slate-900">Pilihan Paket Langganan Pekerja</h3>
+                        <p class="text-[10px] text-slate-500">Pilih paket untuk memprioritaskan profil Anda ke Perusahaan</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[9px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">PAKET PEMULA</span>
+                                    <h4 class="text-sm font-extrabold text-slate-900 mt-1">1. Paket Silver Pekerja</h4>
+                                </div>
+                                <span class="text-xs font-black text-emerald-600">${silverPriceText}</span>
+                            </div>
+                            <p class="text-[10px] text-slate-500">${silverSubText}</p>
+                            <div class="p-2.5 bg-slate-50 rounded-xl text-[10px] text-slate-700 space-y-1 border border-slate-100">
+                                <p class="font-bold text-slate-900">Keuntungan Paket Silver:</p>
+                                <ul class="list-disc pl-4 space-y-0.5 text-slate-600">
+                                    <li>Melamar hingga ke 3 lowongan pekerjaan per bulan.</li>
+                                    <li>Akses fitur Chat langsung dengan Admin.</li>
+                                    <li>Status profil terverifikasi dasar.</li>
+                                </ul>
+                            </div>
+                            <button onclick="requestSubscription('Silver', 'Rp 0 / Rp 25.000')" class="w-full py-2 bg-slate-900 text-amber-400 font-bold rounded-xl text-xs">Pilih Silver</button>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-amber-300 shadow-sm space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[9px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">RECOMMENDED</span>
+                                    <h4 class="text-sm font-extrabold text-slate-900 mt-1">2. Paket Platinum Pekerja</h4>
+                                </div>
+                                <span class="text-xs font-black text-amber-600">Rp 50.000 / bulan</span>
+                            </div>
+                            <div class="p-2.5 bg-amber-50/50 rounded-xl text-[10px] text-slate-700 space-y-1 border border-amber-200/60">
+                                <p class="font-bold text-slate-900">Keuntungan Paket Platinum:</p>
+                                <ul class="list-disc pl-4 space-y-0.5 text-slate-600">
+                                    <li>Semua keuntungan Paket Silver.</li>
+                                    <li>Kirim lamaran hingga ke 10 lowongan pekerjaan.</li>
+                                    <li>Prioritas antrean review lamaran oleh Admin.</li>
+                                    <li>Akses Chat terpisah dengan Admin & Perusahaan.</li>
+                                </ul>
+                            </div>
+                            <button onclick="requestSubscription('Platinum', 'Rp 50.000')" class="w-full py-2 bg-amber-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Platinum (Rp 50rb)</button>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[9px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">POPULER</span>
+                                    <h4 class="text-sm font-extrabold text-slate-900 mt-1">3. Paket Gold Pekerja</h4>
+                                </div>
+                                <span class="text-xs font-black text-slate-900">Rp 100.000 / bulan</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded-xl text-[10px] text-slate-700 space-y-1 border border-slate-100">
+                                <p class="font-bold text-slate-900">Keuntungan Paket Gold:</p>
+                                <ul class="list-disc pl-4 space-y-0.5 text-slate-600">
+                                    <li>Semua keuntungan Paket Platinum.</li>
+                                    <li>Bebas kirim lamaran tanpa batasan kuota.</li>
+                                    <li>Badge "Gold Member" di Dashboard Perusahaan.</li>
+                                    <li>Profil direkomendasikan di urutan paling atas.</li>
+                                </ul>
+                            </div>
+                            <button onclick="requestSubscription('Gold', 'Rp 100.000')" class="w-full py-2 bg-slate-900 text-yellow-400 font-bold rounded-xl text-xs">Pilih Gold (Rp 100rb)</button>
+                        </div>
+
+                        <div class="bg-slate-900 text-white p-4 rounded-2xl border border-cyan-500/30 shadow-lg space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[9px] font-bold bg-cyan-500 text-slate-950 px-2 py-0.5 rounded-full">ULTIMATE VIP</span>
+                                    <h4 class="text-sm font-extrabold text-cyan-300 mt-1">4. Paket Diamond Pekerja</h4>
+                                </div>
+                                <span class="text-xs font-black text-cyan-400">Rp 200.000 / bulan</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-800 rounded-xl text-[10px] text-slate-300 space-y-1 border border-slate-700">
+                                <p class="font-bold text-cyan-400">Keuntungan Paket Diamond VIP:</p>
+                                <ul class="list-disc pl-4 space-y-0.5 text-slate-300">
+                                    <li>Semua Fitur Gold + Layanan Fast-Track Rekrutmen.</li>
+                                    <li>Sorotan spesial "Diamond VIP" bagi Perusahaan.</li>
+                                    <li>Bantuan review resume & portofolio dari Admin.</li>
+                                </ul>
+                            </div>
+                            <button onclick="requestSubscription('Diamond', 'Rp 200.000')" class="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Diamond (Rp 200rb)</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function renderPerusahaanSubscription(container, acc) {
+            let html = `
+                <div class="fade-in space-y-4">
+                    <div class="text-center">
+                        <h3 class="text-sm font-extrabold text-slate-900">Pilihan Paket Langganan Perusahaan</h3>
+                        <p class="text-[10px] text-slate-500">Pilih paket mitra perusahaan untuk akses publikasi lowongan</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[9px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">MITRA SILVER</span>
+                                    <h4 class="text-sm font-extrabold text-slate-900 mt-1">1. Paket Silver Perusahaan</h4>
+                                </div>
+                                <span class="text-xs font-black text-slate-900">Rp 75.000 / bulan</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded-xl text-[10px] text-slate-700 space-y-1 border border-slate-100">
+                                <p class="font-bold text-slate-900">Keuntungan Paket Silver Perusahaan:</p>
+                                <ul class="list-disc pl-4 space-y-0.5 text-slate-600">
+                                    <li>Memublikasikan hingga 3 Lowongan Pekerjaan aktif.</li>
+                                    <li>Akses menerima pelamar yang sudah dikurasi Admin.</li>
+                                    <li>Fitur Chat obrolan langsung dengan Pekerja.</li>
+                                </ul>
+                            </div>
+                            <button onclick="requestSubscription('Silver', 'Rp 75.000')" class="w-full py-2 bg-slate-900 text-amber-400 font-bold rounded-xl text-xs">Pilih Silver (Rp 75rb)</button>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-amber-300 shadow-sm space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[9px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">MITRA PLATINUM</span>
+                                    <h4 class="text-sm font-extrabold text-slate-900 mt-1">2. Paket Platinum Perusahaan</h4>
+                                </div>
+                                <span class="text-xs font-black text-amber-600">Rp 120.000 / bulan</span>
+                            </div>
+                            <div class="p-2.5 bg-amber-50/50 rounded-xl text-[10px] text-slate-700 space-y-1 border border-amber-200/60">
+                                <p class="font-bold text-slate-900">Keuntungan Paket Platinum Perusahaan:</p>
+                                <ul class="list-disc pl-4 space-y-0.5 text-slate-600">
+                                    <li>Memublikasikan hingga 10 Lowongan Pekerjaan aktif.</li>
+                                    <li>Prioritas penerusan berkas pelamar oleh Admin.</li>
+                                    <li>Badge "Perusahaan Terverifikasi Platinum".</li>
+                                </ul>
+                            </div>
+                            <button onclick="requestSubscription('Platinum', 'Rp 120.000')" class="w-full py-2 bg-amber-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Platinum (Rp 120rb)</button>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[9px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">MITRA GOLD</span>
+                                    <h4 class="text-sm font-extrabold text-slate-900 mt-1">3. Paket Gold Perusahaan</h4>
+                                </div>
+                                <span class="text-xs font-black text-slate-900">Rp 180.000 / bulan</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded-xl text-[10px] text-slate-700 space-y-1 border border-slate-100">
+                                <p class="font-bold text-slate-900">Keuntungan Paket Gold Perusahaan:</p>
+                                <ul class="list-disc pl-4 space-y-0.5 text-slate-600">
+                                    <li>Bebas memublikasikan Lowongan Kerja tanpa batas.</li>
+                                    <li>Penampilan lowongan di posisi teratas halaman Pekerja.</li>
+                                    <li>Sistem balasan/notifikasi otomatis instan ke Pekerja.</li>
+                                </ul>
+                            </div>
+                            <button onclick="requestSubscription('Gold', 'Rp 180.000')" class="w-full py-2 bg-slate-900 text-yellow-400 font-bold rounded-xl text-xs">Pilih Gold (Rp 180rb)</button>
+                        </div>
+
+                        <div class="bg-slate-900 text-white p-4 rounded-2xl border border-cyan-500/30 shadow-lg space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[9px] font-bold bg-cyan-500 text-slate-950 px-2 py-0.5 rounded-full">DIAMOND VIP</span>
+                                    <h4 class="text-sm font-extrabold text-cyan-300 mt-1">4. Paket Diamond Perusahaan</h4>
+                                </div>
+                                <span class="text-xs font-black text-cyan-400">Rp 270.000 / bulan</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-800 rounded-xl text-[10px] text-slate-300 space-y-1 border border-slate-700">
+                                <p class="font-bold text-cyan-400">Keuntungan Paket Diamond VIP Perusahaan:</p>
+                                <ul class="list-disc pl-4 space-y-0.5 text-slate-300">
+                                    <li>Semua Fitur Paket Gold Perusahaan.</li>
+                                    <li>Akses eksklusif ke talenta terbaik (Gold & Diamond Pekerja).</li>
+                                    <li>Dukungan Rekrutmen VIP khusus dari Admin Ruang Kerja.</li>
+                                </ul>
+                            </div>
+                            <button onclick="requestSubscription('Diamond', 'Rp 270.000')" class="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Diamond (Rp 270rb)</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function requestSubscription(tierName, price) {
+            const acc = state.userAccounts[state.currentUserEmail];
+            acc.tier = tierName;
+            acc.subStatus = 'PENDING';
+
+            state.notifications.unshift({
+                id: Date.now(),
+                recipientEmail: 'admin@ruangkerja.id',
+                senderName: state.currentUserName,
+                title: `[REQUEST LANGGANAN]: ${tierName}`,
+                message: `Pengguna ${state.currentUserName} (${state.currentRole}) mengajukan Paket ${tierName} (${price}). Membutuhkan Approval Admin.`,
+                time: 'Baru saja',
+                read: false
+            });
+
+            alert(`Pengajuan Paket ${tierName} (${price}) telah dikirim! Silakan tunggu approval Admin.`);
+            navigateTo('dashboard');
+        }
+
+        function confirmSignOut() {
+            document.getElementById('signOutModal').classList.remove('hidden');
+        }
+
+        function closeSignOutModal() {
+            document.getElementById('signOutModal').classList.add('hidden');
+        }
+
+        function executeSignOut() {
+            closeSignOutModal();
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('roleSelectScreen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
