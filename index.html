@@ -267,6 +267,58 @@
 
     <!-- MODALS & POPUPS -->
 
+    <!-- PAYMENT GATEWAY MODAL (M-BANKING, E-WALLET, QRIS) -->
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+        <div class="bg-white text-slate-900 rounded-3xl p-5 w-full max-w-sm shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto hide-scrollbar">
+            <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-wallet text-xs"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-xs text-slate-900">Pembayaran Paket</h3>
+                        <p class="text-[9px] text-slate-400" id="payModalPackageTitle">Paket Platinum</p>
+                    </div>
+                </div>
+                <button onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Total Tagihan -->
+            <div class="bg-slate-50 border border-slate-200 p-3 rounded-2xl flex justify-between items-center">
+                <span class="text-xs text-slate-600 font-medium">Total Tagihan:</span>
+                <span class="text-sm font-extrabold text-amber-600" id="payModalPrice">Rp 50.000</span>
+            </div>
+
+            <!-- Pilih Metode Pembayaran -->
+            <div class="space-y-2">
+                <label class="block text-[11px] font-bold text-slate-700">Pilih Metode Pembayaran</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="selectPayMethod('mbanking')" id="btnMethodMbanking" class="p-2.5 rounded-xl border border-amber-500 bg-amber-50 text-slate-900 font-bold text-[10px] flex flex-col items-center justify-center space-y-1 transition">
+                        <i class="fa-solid fa-building-columns text-amber-600 text-sm"></i>
+                        <span>M-Banking</span>
+                    </button>
+                    <button onclick="selectPayMethod('ewallet')" id="btnMethodEwallet" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-bold text-[10px] flex flex-col items-center justify-center space-y-1 transition">
+                        <i class="fa-solid fa-wallet text-cyan-600 text-sm"></i>
+                        <span>E-Wallet</span>
+                    </button>
+                    <button onclick="selectPayMethod('qris')" id="btnMethodQris" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-bold text-[10px] flex flex-col items-center justify-center space-y-1 transition">
+                        <i class="fa-solid fa-qrcode text-emerald-600 text-sm"></i>
+                        <span>QRIS / QR</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Payment Details Box -->
+            <div id="paymentMethodContent" class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 text-xs">
+                <!-- Javascript will inject M-Banking / E-Wallet / QRIS form here -->
+            </div>
+
+            <button onclick="processFinalPayment()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-extrabold rounded-xl shadow-lg hover:brightness-110 transition text-xs">
+                Konfirmasi Pembayaran Selesai &rarr;
+            </button>
+        </div>
+    </div>
+
     <!-- Email-Style Notification Reader Modal -->
     <div id="notifDetailModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
         <div class="bg-white text-slate-900 rounded-3xl p-5 w-full max-w-sm shadow-2xl space-y-4 border border-slate-200">
@@ -408,7 +460,11 @@
 
             activePekerjaChatTab: 'admin',
             activeAdminTargetEmail: 'pekerja@ruangkerja.id', 
-            activeCompanyTargetApplicant: 'pekerja@ruangkerja.id', // Pelamar aktif yang sedang diclose chat-nya oleh Perusahaan
+            activeCompanyTargetApplicant: 'pekerja@ruangkerja.id',
+
+            selectedTierForPay: '',
+            selectedPriceForPay: '',
+            currentPayMethod: 'mbanking',
 
             userAccounts: {
                 'pekerja@ruangkerja.id': {
@@ -451,7 +507,7 @@
             applications: [],
 
             chatsAdminPekerja: {},   
-            chatsCompanyPekerja: {}, // Format: { 'email_pekerja': [ {sender: '...', text: '...', time: '...'} ] }
+            chatsCompanyPekerja: {}, 
 
             notifications: [
                 {
@@ -793,7 +849,6 @@
 
                 app.status = 'ACCEPTED';
 
-                // 1. Notifikasi Resmi
                 state.notifications.unshift({
                     id: Date.now(),
                     recipientEmail: app.applicantEmail,
@@ -804,7 +859,6 @@
                     read: false
                 });
 
-                // 2. Masukkan Pesan Perusahaan Langsung ke Store Chat Perusahaan - Pekerja
                 if(!state.chatsCompanyPekerja[app.applicantEmail]) {
                     state.chatsCompanyPekerja[app.applicantEmail] = [];
                 }
@@ -812,7 +866,7 @@
                 const timeStr = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
 
                 state.chatsCompanyPekerja[app.applicantEmail].push({
-                    sender: state.currentUserName, // Nama Perusahaan
+                    sender: state.currentUserName,
                     text: `[PENGUMUMAN PENERIMAAN]: ${autoMsg}`,
                     time: timeStr
                 });
@@ -1075,7 +1129,7 @@
         function attemptApplyJob(id, title, company, companyEmail) {
             const acc = state.userAccounts[state.currentUserEmail];
             if(acc.subStatus !== 'APPROVED') {
-                alert('Mohon maaf, Anda belum mengaktifkan Paket Langganan. Silakan pilih paket langganan (seperti Paket Silver Gratis) di menu Paket!');
+                alert('Mohon maaf, Anda belum mengaktifkan Paket Langganan. Silakan pilih paket langganan di menu Paket!');
                 navigateTo('subscription');
                 return;
             }
@@ -1142,7 +1196,7 @@
         }
 
         // ==========================================
-        // 3. CHAT PAGE (DIPERBAIKI UNTUK DUA ARAH PERUSAHAAN & PEKERJA)
+        // 3. CHAT PAGE
         // ==========================================
         function renderChatPage(container) {
             const isPekerja = state.currentRole === 'pekerja';
@@ -1152,7 +1206,6 @@
                 <div class="fade-in flex flex-col h-full bg-slate-900 rounded-2xl overflow-hidden border border-slate-800">
                     
                     ${isPekerja ? `
-                        <!-- Switcher 2 Tab Khusus Portal Pekerja -->
                         <div class="bg-slate-800 p-2 flex border-b border-slate-700 gap-1">
                             <button onclick="switchPekerjaChatTab('admin')" class="flex-1 py-1.5 text-[10px] font-extrabold rounded-lg transition ${state.activePekerjaChatTab === 'admin' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'}">
                                 💬 Chat Admin
@@ -1162,7 +1215,6 @@
                             </button>
                         </div>
                     ` : isAdmin ? `
-                        <!-- Header Chat Admin ke Pelamar -->
                         <div class="bg-slate-800 p-3 flex items-center justify-between border-b border-slate-700">
                             <div class="flex items-center space-x-2">
                                 <div class="w-8 h-8 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center font-bold text-xs">
@@ -1175,7 +1227,6 @@
                             </div>
                         </div>
                     ` : `
-                        <!-- Header Single Tab Perusahaan -->
                         <div class="bg-slate-800 p-3 flex items-center justify-between border-b border-slate-700">
                             <div class="flex items-center space-x-2">
                                 <div class="w-8 h-8 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center font-bold text-xs">
@@ -1189,12 +1240,10 @@
                         </div>
                     `}
 
-                    <!-- Chat Body -->
                     <div id="chatMessagesBox" class="flex-1 p-3 overflow-y-auto space-y-2 hide-scrollbar">
                         ${renderChatMessages()}
                     </div>
 
-                    <!-- Chat Input -->
                     <form onsubmit="sendMessage(event)" class="p-2 bg-slate-800 border-t border-slate-700 flex space-x-2">
                         <input type="text" id="chatInput" placeholder="Tulis pesan..." required class="flex-1 text-xs p-2.5 bg-slate-900 text-white border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500">
                         <button type="submit" class="w-10 h-10 bg-amber-500 text-slate-950 rounded-xl flex items-center justify-center font-bold">
@@ -1223,13 +1272,12 @@
                     chatKey = state.currentUserEmail;
                 } else {
                     store = state.chatsCompanyPekerja;
-                    chatKey = state.currentUserEmail; // Pekerja melihat chat dengan perusahaannya sendiri
+                    chatKey = state.currentUserEmail;
                 }
             } else if(isAdmin) {
                 store = state.chatsAdminPekerja;
                 chatKey = state.activeAdminTargetEmail; 
             } else {
-                // Perusahaan melihat chat dengan pelamar yang sedang dipilih
                 store = state.chatsCompanyPekerja;
                 chatKey = state.activeCompanyTargetApplicant; 
             }
@@ -1289,7 +1337,7 @@
             const timeStr = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
 
             store[chatKey].push({
-                sender: state.currentUserName, // Nama pengirim (bisa Pekerja, Perusahaan, atau Admin)
+                sender: state.currentUserName,
                 text: input.value.trim(),
                 time: timeStr
             });
@@ -1352,7 +1400,7 @@
         }
 
         // ==========================================
-        // 5. SUBSCRIPTION PAGE
+        // 5. SUBSCRIPTION & PAYMENT GATEWAY PAGE
         // ==========================================
         function renderSubscriptionPage(container) {
             const acc = state.userAccounts[state.currentUserEmail];
@@ -1408,7 +1456,7 @@
                                     <li>Status profil terverifikasi dasar.</li>
                                 </ul>
                             </div>
-                            <button onclick="requestSubscription('Silver', 'Rp 0 / Rp 25.000')" class="w-full py-2 bg-slate-900 text-amber-400 font-bold rounded-xl text-xs">Pilih Silver</button>
+                            <button onclick="openPaymentModal('Silver', 'Gratis')" class="w-full py-2 bg-slate-900 text-amber-400 font-bold rounded-xl text-xs">Pilih Silver</button>
                         </div>
 
                         <div class="bg-white p-4 rounded-2xl border border-amber-300 shadow-sm space-y-2">
@@ -1428,7 +1476,7 @@
                                     <li>Akses Chat terpisah dengan Admin & Perusahaan.</li>
                                 </ul>
                             </div>
-                            <button onclick="requestSubscription('Platinum', 'Rp 50.000')" class="w-full py-2 bg-amber-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Platinum (Rp 50rb)</button>
+                            <button onclick="openPaymentModal('Platinum', 'Rp 50.000')" class="w-full py-2 bg-amber-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Platinum (Rp 50rb)</button>
                         </div>
 
                         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
@@ -1448,7 +1496,7 @@
                                     <li>Profil direkomendasikan di urutan paling atas.</li>
                                 </ul>
                             </div>
-                            <button onclick="requestSubscription('Gold', 'Rp 100.000')" class="w-full py-2 bg-slate-900 text-yellow-400 font-bold rounded-xl text-xs">Pilih Gold (Rp 100rb)</button>
+                            <button onclick="openPaymentModal('Gold', 'Rp 100.000')" class="w-full py-2 bg-slate-900 text-yellow-400 font-bold rounded-xl text-xs">Pilih Gold (Rp 100rb)</button>
                         </div>
 
                         <div class="bg-slate-900 text-white p-4 rounded-2xl border border-cyan-500/30 shadow-lg space-y-2">
@@ -1467,7 +1515,7 @@
                                     <li>Bantuan review resume & portofolio dari Admin.</li>
                                 </ul>
                             </div>
-                            <button onclick="requestSubscription('Diamond', 'Rp 200.000')" class="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Diamond (Rp 200rb)</button>
+                            <button onclick="openPaymentModal('Diamond', 'Rp 200.000')" class="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Diamond (Rp 200rb)</button>
                         </div>
                     </div>
                 </div>
@@ -1500,7 +1548,7 @@
                                     <li>Fitur Chat obrolan langsung dengan Pekerja.</li>
                                 </ul>
                             </div>
-                            <button onclick="requestSubscription('Silver', 'Rp 75.000')" class="w-full py-2 bg-slate-900 text-amber-400 font-bold rounded-xl text-xs">Pilih Silver (Rp 75rb)</button>
+                            <button onclick="openPaymentModal('Silver (Perusahaan)', 'Rp 75.000')" class="w-full py-2 bg-slate-900 text-amber-400 font-bold rounded-xl text-xs">Pilih Silver (Rp 75rb)</button>
                         </div>
 
                         <div class="bg-white p-4 rounded-2xl border border-amber-300 shadow-sm space-y-2">
@@ -1519,7 +1567,7 @@
                                     <li>Badge "Perusahaan Terverifikasi Platinum".</li>
                                 </ul>
                             </div>
-                            <button onclick="requestSubscription('Platinum', 'Rp 120.000')" class="w-full py-2 bg-amber-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Platinum (Rp 120rb)</button>
+                            <button onclick="openPaymentModal('Platinum (Perusahaan)', 'Rp 120.000')" class="w-full py-2 bg-amber-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Platinum (Rp 120rb)</button>
                         </div>
 
                         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
@@ -1538,7 +1586,7 @@
                                     <li>Sistem balasan/notifikasi otomatis instan ke Pekerja.</li>
                                 </ul>
                             </div>
-                            <button onclick="requestSubscription('Gold', 'Rp 180.000')" class="w-full py-2 bg-slate-900 text-yellow-400 font-bold rounded-xl text-xs">Pilih Gold (Rp 180rb)</button>
+                            <button onclick="openPaymentModal('Gold (Perusahaan)', 'Rp 180.000')" class="w-full py-2 bg-slate-900 text-yellow-400 font-bold rounded-xl text-xs">Pilih Gold (Rp 180rb)</button>
                         </div>
 
                         <div class="bg-slate-900 text-white p-4 rounded-2xl border border-cyan-500/30 shadow-lg space-y-2">
@@ -1557,7 +1605,7 @@
                                     <li>Dukungan Rekrutmen VIP khusus dari Admin Ruang Kerja.</li>
                                 </ul>
                             </div>
-                            <button onclick="requestSubscription('Diamond', 'Rp 270.000')" class="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Diamond (Rp 270rb)</button>
+                            <button onclick="openPaymentModal('Diamond (Perusahaan)', 'Rp 270.000')" class="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-extrabold rounded-xl text-xs">Pilih Diamond (Rp 270rb)</button>
                         </div>
                     </div>
                 </div>
@@ -1565,7 +1613,88 @@
             container.innerHTML = html;
         }
 
-        function requestSubscription(tierName, price) {
+        // PAYMENT MODAL FUNCTIONS
+        function openPaymentModal(tierName, priceText) {
+            state.selectedTierForPay = tierName;
+            state.selectedPriceForPay = priceText;
+
+            document.getElementById('payModalPackageTitle').innerText = `Paket ${tierName}`;
+            document.getElementById('payModalPrice').innerText = priceText;
+
+            selectPayMethod('mbanking');
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
+
+        function selectPayMethod(method) {
+            state.currentPayMethod = method;
+
+            // Reset tab styling
+            ['mbanking', 'ewallet', 'qris'].forEach(m => {
+                const btn = document.getElementById(`btnMethod${m.charAt(0).toUpperCase() + m.slice(1)}`);
+                if(m === method) {
+                    btn.className = "p-2.5 rounded-xl border border-amber-500 bg-amber-50 text-slate-900 font-bold text-[10px] flex flex-col items-center justify-center space-y-1 transition";
+                } else {
+                    btn.className = "p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-bold text-[10px] flex flex-col items-center justify-center space-y-1 transition";
+                }
+            });
+
+            const contentBox = document.getElementById('paymentMethodContent');
+
+            if(method === 'mbanking') {
+                contentBox.innerHTML = `
+                    <div class="space-y-2">
+                        <label class="block font-bold text-slate-700">Pilih Bank Transfer (M-Banking)</label>
+                        <select id="payBankChoice" class="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-medium">
+                            <option value="BCA">BCA Virtual Account (88001293841)</option>
+                            <option value="Mandiri">Mandiri Virtual Account (89008273619)</option>
+                            <option value="BRI">BRI Virtual Account (20019283746)</option>
+                            <option value="BNI">BNI Virtual Account (98801293847)</option>
+                        </select>
+                        <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[10px] text-amber-900 space-y-1">
+                            <p class="font-bold">Instruksi M-Banking:</p>
+                            <p>1. Buka aplikasi M-Banking pilihan Anda.<br>2. Pilih menu <strong>Transfer > Virtual Account</strong>.<br>3. Masukkan nomor VA di atas dan selesaikan pembayaran.</p>
+                        </div>
+                    </div>
+                `;
+            } else if(method === 'ewallet') {
+                contentBox.innerHTML = `
+                    <div class="space-y-2">
+                        <label class="block font-bold text-slate-700">Pilih E-Wallet</label>
+                        <select id="payEwalletChoice" class="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-medium">
+                            <option value="GoPay">GoPay / Gojek</option>
+                            <option value="OVO">OVO Digital Wallet</option>
+                            <option value="DANA">DANA Dompet Digital</option>
+                            <option value="ShopeePay">ShopeePay</option>
+                        </select>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-1">Nomor HP Terdaftar E-Wallet:</label>
+                            <input type="text" id="payEwalletPhone" placeholder="08xxxxxxxxxx" value="081234567890" class="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs">
+                        </div>
+                    </div>
+                `;
+            } else if(method === 'qris') {
+                contentBox.innerHTML = `
+                    <div class="text-center space-y-2 py-1">
+                        <p class="font-bold text-slate-800 text-[11px]">Scan QRIS untuk Semua E-Wallet & M-Banking</p>
+                        <div class="w-36 h-36 bg-white border-2 border-dashed border-slate-300 rounded-2xl mx-auto flex flex-col items-center justify-center p-2 shadow-inner">
+                            <i class="fa-solid fa-qrcode text-6xl text-slate-900"></i>
+                            <span class="text-[8px] text-slate-400 mt-1">QRIS RUANG KERJA ID</span>
+                        </div>
+                        <p class="text-[10px] text-slate-500">Buka BCA Mobile, GoPay, OVO, DANA, atau Livin, lalu scan kode QR di atas.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function processFinalPayment() {
+            const tierName = state.selectedTierForPay;
+            const price = state.selectedPriceForPay;
+            const method = state.currentPayMethod.toUpperCase();
+
             const acc = state.userAccounts[state.currentUserEmail];
             acc.tier = tierName;
             acc.subStatus = 'PENDING';
@@ -1574,13 +1703,14 @@
                 id: Date.now(),
                 recipientEmail: 'admin@ruangkerja.id',
                 senderName: state.currentUserName,
-                title: `[REQUEST LANGGANAN]: ${tierName}`,
-                message: `Pengguna ${state.currentUserName} (${state.currentRole}) mengajukan Paket ${tierName} (${price}). Membutuhkan Approval Admin.`,
+                title: `[KONFIRMASI BAYAR]: ${tierName} (${method})`,
+                message: `Pengguna ${state.currentUserName} (${state.currentRole}) telah melakukan pembayaran paket ${tierName} sebesar ${price} via metode ${method}. Mohon segera Approve.`,
                 time: 'Baru saja',
                 read: false
             });
 
-            alert(`Pengajuan Paket ${tierName} (${price}) telah dikirim! Silakan tunggu approval Admin.`);
+            closePaymentModal();
+            alert(`Pembayaran via ${method} berhasil disubmit! Konfirmasi pembayaran telah diteruskan ke Admin untuk di-approve.`);
             navigateTo('dashboard');
         }
 
